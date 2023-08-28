@@ -5,6 +5,11 @@ pipeline {
             args '-p 3000:3000'
         }
     }
+
+    environment {
+      VERCEL_TOKEN=credentials('vercel_token')
+    }
+
     stages {
         stage('Build') {
             steps {
@@ -12,9 +17,9 @@ pipeline {
             }
         }
         
-        stage('Test') {
+        stage('Pull') {
             steps {
-                sh './jenkins/scripts/test.sh'
+                sh 'vercel --token $VERCEL_TOKEN pull --yes'
             }
         }
 
@@ -26,7 +31,7 @@ pipeline {
 
         stage('Deploy') { 
             steps {
-                sh './jenkins/scripts/deliver.sh'
+                sh 'vercel --token $VERCEL_TOKEN  deploy'
                 sleep(time: 1, unit: 'MINUTES')
                 sh './jenkins/scripts/kill.sh' 
             }
