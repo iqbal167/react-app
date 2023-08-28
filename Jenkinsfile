@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage('Vercel CLI') {
             steps {
-                sh 'npm install --global vercel'
+                sh 'npm install vercel'
             }
         }
         
