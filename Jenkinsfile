@@ -11,9 +11,9 @@ pipeline {
     }
 
     stages {
-        stage('Vercel CLI') {
+        stage('Verify Vercel CLI') {
             steps {
-                sh 'npm install vercel'
+                sh 'npx vercel --version'
             }
         }
         
@@ -25,7 +25,7 @@ pipeline {
 
          stage('Pull') {
             steps {
-                sh 'vercel --token $VERCEL_TOKEN pull --yes'
+                sh 'npx vercel --token $VERCEL_TOKEN pull --yes'
             }
         }
 
@@ -37,7 +37,7 @@ pipeline {
 
         stage('Deploy') { 
             steps {
-                sh 'vercel --token $VERCEL_TOKEN deploy '
+                sh 'npx vercel --token $VERCEL_TOKEN deploy '
                 sleep(time: 1, unit: 'MINUTES')
                 sh './jenkins/scripts/kill.sh' 
             }
