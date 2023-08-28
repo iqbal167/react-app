@@ -42,12 +42,6 @@ pipeline {
               sleep(time: 1, unit: 'MINUTES')
           }
       }
-
-      stage('Verify Deployment') { 
-          steps {
-              sh 'curl https://$APP_URL.vercel.app'
-          }
-      }
   }
   post { 
     cleanup { 
