@@ -1,46 +1,57 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:16-buster-slim'
-            args '-p 3000:3000'
-        }
+  agent {
+      docker {
+          image 'node:16-buster-slim'
+          args '-p 3000:3000'
+      }
+  }
+
+  environment {
+    VERCEL_TOKEN = credentials('vercel-token')
+    APP_URL = "react-app-v2"
+  }
+
+  stages {
+      stage('Verify Vercel CLI') {
+          steps {
+              sh 'npx vercel --version'
+          }
+      }
+      
+      stage('Test') {
+          steps {
+              sh './jenkins/scripts/test.sh'
+          }
+      }
+
+        stage('Pull') {
+          steps {
+              sh 'npx vercel --token $VERCEL_TOKEN pull --yes'
+          }
+      }
+
+      stage('Manual Approval') {
+          steps {
+              input message: 'Lanjutkan ke tahap Deploy?'
+          }
+      }
+
+      stage('Deploy') { 
+          steps {
+              sh 'npx vercel --token $VERCEL_TOKEN deploy '
+              sleep(time: 1, unit: 'MINUTES')
+          }
+      }
+
+      stage('Verify Deployment') { 
+          steps {
+              sh 'curl https://$APP_URL.vercel.app'
+          }
+      }
+  }
+  post { 
+    cleanup { 
+      cleanWs()
     }
-
-    environment {
-      VERCEL_TOKEN = credentials('vercel-token')
-    }
-
-    stages {
-        stage('Verify Vercel CLI') {
-            steps {
-                sh 'npx vercel --version'
-            }
-        }
-        
-        stage('Test') {
-            steps {
-                sh './jenkins/scripts/test.sh'
-            }
-        }
-
-         stage('Pull') {
-            steps {
-                sh 'npx vercel --token $VERCEL_TOKEN pull --yes'
-            }
-        }
-
-        stage('Manual Approval') {
-            steps {
-                input message: 'Lanjutkan ke tahap Deploy?'
-            }
-        }
-
-        stage('Deploy') { 
-            steps {
-                sh 'npx vercel --token $VERCEL_TOKEN deploy '
-                sleep(time: 1, unit: 'MINUTES')
-                sh './jenkins/scripts/kill.sh' 
-            }
-        }
-    }
+  }
 }
