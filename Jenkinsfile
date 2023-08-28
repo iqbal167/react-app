@@ -11,12 +11,6 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
-            steps {
-                sh 'npm install'
-            }
-        }
-        
         stage('Pull') {
             steps {
                 sh 'vercel --token $VERCEL_TOKEN pull --yes'
