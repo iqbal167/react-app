@@ -12,30 +12,42 @@ pipeline {
   }
 
   stages {
-      stage('Verify Vercel CLI') {
-          steps {
-              sh 'npx vercel --version'
-          }
+    stage('Build') {
+      steps {
+        sh 'npm install'
       }
-      
-      stage('Pull') {
-          steps {
-              sh 'npx vercel --token $VERCEL_TOKEN pull --yes'
-          }
-      }
+    }
 
-      stage('Manual Approval') {
-          steps {
-              input message: 'Lanjutkan ke tahap Deploy?'
-          }
+    stage('Test') {
+      steps {
+        sh './jenkins/scripts/test.sh'
       }
+    }
 
-      stage('Deploy') { 
-          steps {
-              sh 'npx vercel --token $VERCEL_TOKEN deploy '
-              sleep(time: 1, unit: 'MINUTES')
-          }
-      }
+    stage('Verify Vercel CLI') {
+        steps {
+            sh 'npx vercel --version'
+        }
+    }
+    
+    stage('Pull') {
+        steps {
+            sh 'npx vercel --token $VERCEL_TOKEN pull --yes'
+        }
+    }
+
+    stage('Manual Approval') {
+        steps {
+            input message: 'Lanjutkan ke tahap Deploy?'
+        }
+    }
+
+    stage('Deploy') { 
+        steps {
+            sh 'npx vercel --token $VERCEL_TOKEN deploy '
+            sleep(time: 1, unit: 'MINUTES')
+        }
+    }
   }
   post { 
     cleanup { 
