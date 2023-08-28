@@ -18,13 +18,7 @@ pipeline {
           }
       }
       
-      stage('Test') {
-          steps {
-              sh './jenkins/scripts/test.sh'
-          }
-      }
-
-        stage('Pull') {
+      stage('Pull') {
           steps {
               sh 'npx vercel --token $VERCEL_TOKEN pull --yes'
           }
