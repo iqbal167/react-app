@@ -7,11 +7,23 @@ pipeline {
     }
 
     environment {
-      VERCEL_TOKEN=credentials('vercel_token')
+      VERCEL_TOKEN = credentials('vercel-token')
     }
 
     stages {
-        stage('Pull') {
+        stage('Build') {
+            steps {
+                sh 'npm install'
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                sh './jenkins/scripts/test.sh'
+            }
+        }
+
+         stage('Pull') {
             steps {
                 sh 'vercel --token $VERCEL_TOKEN pull --yes'
             }
@@ -25,7 +37,7 @@ pipeline {
 
         stage('Deploy') { 
             steps {
-                sh 'vercel --token $VERCEL_TOKEN  deploy'
+                sh 'vercel --token $VERCEL_TOKEN deploy '
                 sleep(time: 1, unit: 'MINUTES')
                 sh './jenkins/scripts/kill.sh' 
             }
